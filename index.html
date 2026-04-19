@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amethyst Library</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="app-container">
+        <header>
+            <h1 class="logo">Amethyst <span>Library</span></h1>
+            <button id="open-modal" class="btn-primary">+ Add Book</button>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab-link active" onclick="switchTab('in-progress')">In Progress</button>
+            <button class="tab-link" onclick="switchTab('unread')">Unread</button>
+            <button class="tab-link" onclick="switchTab('read')">Read</button>
+            <button class="tab-link" onclick="switchTab('achievements')">🏆</button>
+        </nav>
+
+        <main id="book-list" class="book-grid">
+            </main>
+
+        <section id="achievements-list" class="achievements-grid hidden">
+            </section>
+    </div>
+
+    <div id="modal" class="modal hidden">
+        <div class="modal-content">
+            <h2 id="modal-title">Add New Book</h2>
+            <form id="book-form">
+                <input type="hidden" id="edit-id">
+                <div class="input-group">
+                    <label>Book Title</label>
+                    <input type="text" id="title" placeholder="e.g. Project Hail Mary" required>
+                </div>
+                <div class="input-group">
+                    <label>Cover Image URL</label>
+                    <input type="url" id="cover" placeholder="https://...">
+                </div>
+                <div class="input-group-row">
+                    <div class="input-group">
+                        <label>Total Pages</label>
+                        <input type="number" id="total-pages" min="1" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Pages Read</label>
+                        <input type="number" id="pages-read" min="0" value="0">
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" id="close-modal" class="btn-secondary">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Book</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
