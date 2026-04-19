@@ -1,0 +1,20 @@
+{
+  "name": "Amethyst Library",
+  "short_name": "Amethyst",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#a855f7",
+  "icons": [
+    {
+      "src": "https://via.placeholder.com/192/a855f7/ffffff?text=A",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://via.placeholder.com/512/a855f7/ffffff?text=Amethyst",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
