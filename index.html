@@ -4,17 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Amethyst Library</title>
-    
     <link rel="manifest" href="manifest.json">
-    
     <link rel="icon" type="image/png" href="icon-192.png">
-    
     <link rel="apple-touch-icon" href="icon-192.png">
-    
     <meta name="theme-color" content="#0b0e14">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 </head>
@@ -23,21 +18,40 @@
     <div class="app-container">
         <header>
             <h1 class="logo">Amethyst <span>Library</span></h1>
-            <button id="open-modal" class="btn-primary">+ Add Book</button>
+            <button id="open-modal" class="btn-primary">+</button>
         </header>
 
-        <nav class="tabs">
-            <button class="tab-link" onclick="switchTab('unread')">Unread</button>
-            <button class="tab-link active" onclick="switchTab('in-progress')">In Progress</button>
-            <button class="tab-link" onclick="switchTab('read')">Read</button>
-            <button class="tab-link" onclick="switchTab('achievements')">🏆</button>
+        <main id="book-list" class="book-grid"></main>
+
+        <section id="stats-view" class="stats-container hidden">
+            <h2 class="section-title">Library Stats</h2>
+            <div id="stats-content"></div>
+        </section>
+
+        <section id="achievements-list" class="achievements-grid hidden"></section>
+
+        <nav class="bottom-nav">
+            <button class="nav-item" onclick="switchTab('unread')" data-tab="unread">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                <span>Unread</span>
+            </button>
+            <button class="nav-item active" onclick="switchTab('in-progress')" data-tab="in-progress">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                <span>Reading</span>
+            </button>
+            <button class="nav-item" onclick="switchTab('read')" data-tab="read">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                <span>Read</span>
+            </button>
+            <button class="nav-item" onclick="switchTab('stats')" data-tab="stats">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                <span>Stats</span>
+            </button>
+            <button class="nav-item" onclick="switchTab('achievements')" data-tab="achievements">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
+                <span>Ranks</span>
+            </button>
         </nav>
-
-        <main id="book-list" class="book-grid">
-            </main>
-
-        <section id="achievements-list" class="achievements-grid hidden">
-            </section>
     </div>
 
     <div id="modal" class="modal hidden">
@@ -45,23 +59,11 @@
             <h2 id="modal-title">Add New Book</h2>
             <form id="book-form">
                 <input type="hidden" id="edit-id">
-                <div class="input-group">
-                    <label>Book Title</label>
-                    <input type="text" id="title" placeholder="e.g. Project Hail Mary" required>
-                </div>
-                <div class="input-group">
-                    <label>Cover Image URL</label>
-                    <input type="url" id="cover" placeholder="https://...">
-                </div>
+                <div class="input-group"><label>Book Title</label><input type="text" id="title" required></div>
+                <div class="input-group"><label>Cover URL</label><input type="url" id="cover"></div>
                 <div class="input-group-row">
-                    <div class="input-group">
-                        <label>Total Pages</label>
-                        <input type="number" id="total-pages" min="1" required>
-                    </div>
-                    <div class="input-group">
-                        <label>Pages Read</label>
-                        <input type="number" id="pages-read" min="0" value="0">
-                    </div>
+                    <div class="input-group"><label>Total Pages</label><input type="number" id="total-pages" min="1" required></div>
+                    <div class="input-group"><label>Pages Read</label><input type="number" id="pages-read" min="0" value="0"></div>
                 </div>
                 <div class="modal-actions">
                     <button type="button" id="close-modal" class="btn-secondary">Cancel</button>
@@ -71,6 +73,6 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script type="module" src="script.js"></script>
 </body>
 </html>
