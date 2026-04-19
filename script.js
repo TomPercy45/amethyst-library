@@ -4,6 +4,9 @@ let currentTab = 'in-progress';
 // DOM Elements
 const bookList = document.getElementById('book-list');
 const achievementsList = document.getElementById('achievements-list');
+// Ensure this exists in your index.html or create it dynamically below
+let statsList = document.getElementById('stats-list'); 
+
 const bookForm = document.getElementById('book-form');
 const modal = document.getElementById('modal');
 
@@ -17,18 +20,31 @@ function save() {
     render();
 }
 
+/**
+ * Main render engine that handles switching between 
+ * Books, Achievements, and Stats views.
+ */
 function render() {
+    // 1. Clear all containers
     bookList.innerHTML = '';
     achievementsList.innerHTML = '';
-    
-    // Sort Alphabetically
+    if (statsList) statsList.innerHTML = '';
+
+    // 2. Sorting Logic (Always alphabetical)
     const sortedBooks = [...books].sort((a, b) => a.title.localeCompare(b.title));
 
+    // 3. Tab Logic
     if (currentTab === 'achievements') {
         renderAchievements();
         return;
     }
 
+    if (currentTab === 'stats') {
+        renderStats();
+        return;
+    }
+
+    // 4. Book Rendering Logic
     const filtered = sortedBooks.filter(book => {
         const percent = (book.pagesRead / book.totalPages) * 100;
         if (currentTab === 'read') return percent >= 100;
@@ -37,7 +53,7 @@ function render() {
     });
 
     filtered.forEach(book => {
-        const percent = Math.round((book.pagesRead / book.totalPages) * 100);
+        const percent = Math.min(100, Math.round((book.pagesRead / book.totalPages) * 100));
         const card = document.createElement('div');
         card.className = 'book-card';
         
@@ -48,32 +64,78 @@ function render() {
         card.innerHTML = `
             <div class="cover-art">${coverImg || initials}</div>
             <div class="book-info">
-                <h3 class="book-title">${book.title}</h3>
-                <p class="book-meta">${book.totalPages} pages</p>
+                <div>
+                    <h3 class="book-title">${book.title}</h3>
+                    <p class="book-meta">${book.totalPages} pages</p>
+                </div>
+                
                 ${book.pagesRead > 1 ? `
                     <div class="progress-container">
                         <div class="progress-text">
                             <span>${percent}%</span>
-                            <span>${book.pagesRead}/${book.totalPages}</span>
+                            <span>${book.pagesRead} / ${book.totalPages}</span>
                         </div>
                         <div class="progress-bar">
                             <div class="progress-fill" style="width: ${percent}%"></div>
                         </div>
                     </div>
-                ` : '<p class="text-muted" style="font-size:0.7rem">Not started yet</p>'}
-                <button onclick="editBook('${book.id}')" style="margin-top:10px; background:none; border:none; color:#a855f7; font-size:0.8rem; cursor:pointer;">Edit Progress</button>
+                ` : '<p style="color: #94a3b8; font-size: 0.75rem;">Not started yet</p>'}
+                <button onclick="editBook('${book.id}')" style="margin-top:10px; background:none; border:none; color:#a855f7; font-size:0.8rem; cursor:pointer; font-weight:600; text-align:left;">EDIT PROGRESS</button>
             </div>
         `;
         bookList.appendChild(card);
     });
 }
 
+/**
+ * Calculates and displays the 3 specific metrics:
+ * Total Pages, Total Books Read, and Longest Book Read.
+ */
+function renderStats() {
+    bookList.classList.add('hidden');
+    achievementsList.classList.add('hidden');
+    
+    // Fallback if the container is missing in HTML
+    if (!statsList) {
+        statsList = document.createElement('section');
+        statsList.id = 'stats-list';
+        document.querySelector('.app-container').insertBefore(statsList, achievementsList);
+    }
+    statsList.classList.remove('hidden');
+
+    // Calculations
+    const totalPagesRead = books.reduce((acc, b) => acc + (parseInt(b.pagesRead) || 0), 0);
+    const completedBooks = books.filter(b => (b.pagesRead / b.totalPages) >= 1);
+    
+    // Longest book by page count among books that have been read/completed
+    const longestReadBook = completedBooks.length > 0 
+        ? completedBooks.reduce((prev, curr) => (prev.totalPages > curr.totalPages) ? prev : curr)
+        : null;
+
+    const stats = [
+        { label: "Total Pages Read", value: totalPagesRead.toLocaleString() },
+        { label: "Total Books Read", value: completedBooks.length },
+        { label: "Longest Book Finished", value: longestReadBook ? `${longestReadBook.title} (${longestReadBook.totalPages} pages)` : "None yet" }
+    ];
+
+    stats.forEach(stat => {
+        const div = document.createElement('div');
+        div.className = 'achievement-card unlocked'; // Reusing existing CSS styles
+        div.innerHTML = `
+            <p style="color: #94a3b8; font-size: 0.7rem; text-transform: uppercase; font-weight: bold; letter-spacing: 0.5px;">${stat.label}</p>
+            <h3 style="color: #f8fafc; font-size: 1.2rem; margin-top: 5px;">${stat.value}</h3>
+        `;
+        statsList.appendChild(div);
+    });
+}
+
 function renderAchievements() {
     bookList.classList.add('hidden');
+    if (statsList) statsList.classList.add('hidden');
     achievementsList.classList.remove('hidden');
 
     const totalRead = books.filter(b => (b.pagesRead / b.totalPages) >= 1).length;
-    const totalPages = books.reduce((acc, b) => acc + parseInt(b.pagesRead), 0);
+    const totalPages = books.reduce((acc, b) => acc + (parseInt(b.pagesRead) || 0), 0);
 
     const goals = [
         { title: "First Word", desc: "Add your first book", check: books.length > 0 },
@@ -94,7 +156,37 @@ function renderAchievements() {
     });
 }
 
-// Event Listeners
+// --- Navigation & Event Handlers ---
+
+function switchTab(tab) {
+    currentTab = tab;
+    
+    // Update UI active states
+    document.querySelectorAll('.tab-link').forEach(btn => btn.classList.remove('active'));
+    
+    // If called via click event
+    if (event && event.target) {
+        event.target.classList.add('active');
+    }
+
+    // Toggle container visibilities
+    if (tab === 'achievements') {
+        bookList.classList.add('hidden');
+        if (statsList) statsList.classList.add('hidden');
+        achievementsList.classList.remove('hidden');
+    } else if (tab === 'stats') {
+        bookList.classList.add('hidden');
+        achievementsList.classList.add('hidden');
+        if (statsList) statsList.classList.remove('hidden');
+    } else {
+        bookList.classList.remove('hidden');
+        achievementsList.classList.add('hidden');
+        if (statsList) statsList.classList.add('hidden');
+    }
+    
+    render();
+}
+
 bookForm.onsubmit = (e) => {
     e.preventDefault();
     const id = document.getElementById('edit-id').value || Date.now().toString();
@@ -125,16 +217,8 @@ function editBook(id) {
     modal.classList.remove('hidden');
 }
 
-function switchTab(tab) {
-    currentTab = tab;
-    document.querySelectorAll('.tab-link').forEach(btn => btn.classList.remove('active'));
-    event.target.classList.add('active');
-    
-    if(tab !== 'achievements') {
-        bookList.classList.remove('hidden');
-        achievementsList.classList.add('hidden');
-    }
-    render();
+function closeModalFunc() {
+    modal.classList.add('hidden');
 }
 
 document.getElementById('open-modal').onclick = () => {
@@ -144,5 +228,8 @@ document.getElementById('open-modal').onclick = () => {
     modal.classList.remove('hidden');
 };
 
-const closeModalFunc = () => modal.classList.add('hidden');
 document.getElementById('close-modal').onclick = closeModalFunc;
+
+// Expose switchTab and editBook to global scope for HTML onclicks
+window.switchTab = switchTab;
+window.editBook = editBook;
